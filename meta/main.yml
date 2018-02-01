@@ -1,0 +1,22 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: susgo, kukshaus
+  description: Add mysql db and mysql user for Plesk
+  company: "ITEXIA GmbH"
+  license: "license (MIT)"
+  min_ansible_version: 2.3
+  platforms:
+    - name: Linux (Ubuntu, Debian) running Plesk
+      versions:
+      - all
+  galaxy_tags:
+    - plesk
+    - cloud
+    - setup
+    - hosting
+    - sysadmin
+    - mysql
+    - database
+    - dtabase user

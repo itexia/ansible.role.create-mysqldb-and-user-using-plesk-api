@@ -1,0 +1,9 @@
+<packet>
+    <database>
+        <add-db>
+            <webspace-id>{{ webspace_id }}</webspace-id>
+            <name>{{ dbname | regex_replace("\.", "") }}</name>
+            <type>{{ dbtype }}</type>
+        </add-db>
+    </database>
+</packet>

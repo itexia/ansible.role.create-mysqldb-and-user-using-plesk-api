@@ -1,0 +1,80 @@
+- name: "Copy and fill template for creating new db"
+  template:
+    src: "templates/create-db.xml.j2"
+    dest: "/tmp/create-db.xml"
+    mode: 0777
+  delegate_to: localhost
+
+- name: "Create new db {{ dbname }} on strato server with plesk"
+  uri:
+    url: "https://{{ host_url }}:{{ host_port }}/enterprise/control/agent.php"
+    method: POST
+    user: "{{ plesk_admin_user }}"
+    password: "{{ plesk_admin_pw }}"
+    body: "{{ lookup('file','/tmp/create-db.xml') }}"
+    return_content: yes
+    follow_redirects: all
+    force_basic_auth: yes
+    body_format: raw
+    validate_certs: no
+    headers:
+      Content-Type: "text/xml"
+      HTTP_AUTH_LOGIN: "{{ plesk_admin_user }}"
+      HTTP_AUTH_PASSWD: "{{ plesk_admin_pw }}"
+      HTTP_PRETTY_PRINT: TRUE
+    timeout: 120
+    register: dbcreate_response
+    dest: "/tmp/log_create_database_{{ dbname }}.txt"
+    failed_when: '("error" in dbcreate_response.content)'
+  register: create_new_db_response
+
+- name: "create new db response file"
+  copy: content="{{ create_new_db_response.content }}" dest="/tmp/create_db_for_{{ dbname }}.txt"
+
+- name: Read attribute value from create new db response file
+  xml:
+    path: /tmp/create_db_for_{{ dbname }}.txt
+    xpath: /packet/database/add-db/result/id
+    content: text
+  register: new_db_id
+
+- name: "Delete template for instance post"
+  file:
+    path: "/tmp/create-db.xml"
+    state: absent
+  delegate_to: localhost
+
+- name: "Copy and fill template for creating new db user" 
+  template:
+    src: "templates/create-db-user.xml.j2"
+    dest: "/tmp/create-db-user.xml"
+    mode: 0777
+  delegate_to: localhost
+
+- name: "Create new db user {{ dbuser }} for {{ dbname }} on strato server with plesk"
+  uri:
+    url: "https://{{ host_url }}:{{ host_port }}/enterprise/control/agent.php"
+    method: POST
+    user: "{{ plesk_admin_user }}"
+    password: "{{ plesk_admin_pw }}"
+    body: "{{ lookup('file','/tmp/create-db-user.xml') }}"
+    return_content: yes
+    follow_redirects: all
+    force_basic_auth: yes
+    body_format: raw
+    validate_certs: no
+    headers:
+      Content-Type: "text/xml"
+      HTTP_AUTH_LOGIN: "{{ plesk_admin_user }}"
+      HTTP_AUTH_PASSWD: "{{ plesk_admin_pw }}"
+      HTTP_PRETTY_PRINT: TRUE
+    timeout: 120
+    register: create_dbuser_response
+    dest: "/tmp/log_create_dbuser_{{ dbuser }}.txt"
+    failed_when: '("error" in create_dbuser_response.content)'
+
+- name: "Delete template for instance post"
+  file:
+    path: "/tmp/create-db-user.xml"
+    state: absent
+  delegate_to: localhost
