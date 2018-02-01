@@ -2,9 +2,9 @@
 Creates a new database user and database in [Plesk](https://docs.plesk.com/en-US/onyx/api-rpc/reference/managing-databases/creating-database-users.34472/).
 
 ## Requirements
-No special requirements:
   * a server running plesk
   * this role requires admin access for plesk
+  * lxml >= 2.3.0
   
 ## Role Variables
 Required variables are listed below and can be set with values (see `vars/main.yml`):
